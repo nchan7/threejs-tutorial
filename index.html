@@ -10,7 +10,13 @@
   <script src="js/three.js"></script>
   <script src="js/OrbitControls.js"></script>
   <script src="js/ObjectLoader.js"></script>
+  <script src="js/AnaglyphEffect.js"></script>
   <script>
+
+    // Line below includes FPS and RAM usage on page - performance metrics
+  (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);})()
+
+
     var scene = new THREE.Scene(); 
     //* What the user will be viewing and the where the objects will be
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -29,12 +35,15 @@
       camera.updateProjectionMatrix(); 
     });
 
+    var effect = new THREE.AnaglyphEffect(renderer);
+    effect.setSize(window.innerWidth, window.innerHeight); 
+
     controls = new THREE.OrbitControls(camera, renderer.domElement)
 
     var loader = new THREE.ObjectLoader(); 
 
     loader.load(
-      'models/Head.json',
+      'models/Head.json', // I do not have the .json file
 
       function(object) {
         scene.add(object);
@@ -60,6 +69,24 @@
 
     // need this since both camera and cube are initially at the origin
     camera.position.z = 3; 
+
+    //skybox code
+    var geometry = new THREE.CubeGeometry(10000, 10000, 10000)
+    var cubeMaterials =
+    [
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/front.png"), side: THREE.DoubleSide}),
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/back.png"), side: THREE.DoubleSide}),
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/up.png"), side: THREE.DoubleSide}),
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/down.png"), side: THREE.DoubleSide}),
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/right.png"), side: THREE.DoubleSide}),
+      new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("img/Skybox1/left.png"), side: THREE.DoubleSide}),
+    ];
+    
+    var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
+    var cube = new THREE.Mesh(geometry, cubeMaterial);
+    scene.add(cube); 
+    
+    // need to add files for the edges of the cube
 
     var ambientLight = new THREE.AmbientLight(0xFFFFFF, 5.0);
     scene.add(ambientLight); // mesh basic not affected by lighting and can be seen without this line
@@ -102,7 +129,8 @@
     };
     //* draw scene
     var render = function() {
-      renderer.render(scene, camera); 
+      // renderer.render(scene, camera); 
+      effect.render(scene, camera); 
     };
     //* run game loop (update, render, repeat)
     var GameLoop = function() {
@@ -112,6 +140,9 @@
     };
 
     GameLoop(); 
+
+
+    // Skyboxes can be found on custommapmakers.org -> save as PNG file
   </script>
 </body>
 </html>
