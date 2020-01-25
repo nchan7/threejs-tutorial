@@ -9,6 +9,7 @@
 <body>
   <script src="js/three.js"></script>
   <script src="js/OrbitControls.js"></script>
+  <script src="js/ObjectLoader.js"></script>
   <script>
     var scene = new THREE.Scene(); 
     //* What the user will be viewing and the where the objects will be
@@ -29,6 +30,16 @@
     });
 
     controls = new THREE.OrbitControls(camera, renderer.domElement)
+
+    var loader = new THREE.ObjectLoader(); 
+
+    loader.load(
+      'models/Head.json',
+
+      function(object) {
+        scene.add(object);
+      }
+    ); 
 
     // create the shape
     var geometry = new THREE.BoxGeometry(1, 1, 1);
